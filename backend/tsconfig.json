@@ -1,0 +1,20 @@
+// tsconfig.json
+{
+  // Specify compiler options
+  "compilerOptions": {
+    // Target modern JavaScript (ES6)
+    "target": "ES6",
+    // Use CommonJS modules which are standard in Node.js
+    "module": "commonjs",
+    // Specify the folder for compiled JavaScript output
+    "outDir": "./dist",
+    // Specify the root folder of your source code
+    "rootDir": "./src",
+    // Enable all strict type-checking options for production-grade code
+    "strict": true,
+    // Allow default imports from modules that don’t have a default export
+    "esModuleInterop": true,
+    // Skip type checking of declaration files to speed up compilation
+    "skipLibCheck": true
+  }
+}
