@@ -11,10 +11,11 @@ interface TodoItemProps {
     completed: boolean
     // Callback function when the todo is toggled
     onToggle: (id: number) => void
+    onDelete: (id: number) => void
 }
 
 // Define the TodoItem component as a functional component
-const TodoItem: React.FC<TodoItemProps> = ({ id, title, completed, onToggle }) => {
+const TodoItem: React.FC<TodoItemProps> = ({ id, title, completed, onToggle, onDelete }) => {
     return (
         <div>
             <input
@@ -23,6 +24,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, completed, onToggle }) =
                 onChange={() => onToggle(id)}
             />
             <span>{title}</span>
+            <button onClick={() => onDelete(id)}>Delete</button>
         </div>
     )
 }
