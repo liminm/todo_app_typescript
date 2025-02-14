@@ -3,9 +3,9 @@ import TodoItem from './components/TodoItem'
 import AddTodo from './components/AddTodo'
 
 interface Todo {
-    id: number;
-    title: string;
-    completed: boolean;
+    _id: string
+    title: string
+    completed: boolean
 }
 
 const App: React.FC = () => {
@@ -17,7 +17,14 @@ const App: React.FC = () => {
     useEffect(() => {
         const fetchTodos = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/todos')
+                const token = localStorage.getItem('token')
+
+                const response = await fetch('http://localhost:5000/api/todos', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
                 if (!response.ok) {
                     throw new Error('Network response was not ok')
                 }
@@ -32,16 +39,19 @@ const App: React.FC = () => {
         fetchTodos()
     }, [])
 
-    const handleToggle = async (id: number) => {
-        const todo = todos.find((t) => t.id === id)
+    const handleToggle = async (id: string) => {
+        const todo = todos.find((t) => t._id === id)
         if (!todo) return
 
         const updatedTodo = {...todo, completed: !todo.completed}
         try {
+            const token = localStorage.getItem('token')
+
             const response = await fetch(`http://localhost:5000/api/todos/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(updatedTodo)
             })
@@ -49,7 +59,7 @@ const App: React.FC = () => {
                 throw new Error('Network response was not ok')
             }
             setTodos((prevTodos) =>
-                prevTodos.map((t) => (t.id === id ? updatedTodo : t))
+                prevTodos.map((t) => (t._id === id ? updatedTodo : t))
             )
         } catch (err: any) {
             console.error(err)
@@ -57,12 +67,15 @@ const App: React.FC = () => {
     }
 
     const handleAddTodo = async (title: string) => {
-        const newTodo = { title, completed: false }
+        const newTodo = {title, completed: false}
         try {
+            const token = localStorage.getItem('token')
+
             const response = await fetch(`http://localhost:5000/api/todos`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(newTodo)
             })
@@ -76,23 +89,24 @@ const App: React.FC = () => {
         }
     }
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         try {
+            const token = localStorage.getItem('token')
+
             const response = await fetch(`http://localhost:5000/api/todos/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             })
             if (!response.ok) {
                 throw new Error('Failed to delete todo')
             }
-            setTodos((prevTodos) => prevTodos.filter((t) => t.id !== id))
+            setTodos((prevTodos) => prevTodos.filter((t) => t._id !== id))
         } catch (err: any) {
             console.error(err)
         }
-
-
-
     }
-
 
     return (
         <div>
@@ -102,8 +116,8 @@ const App: React.FC = () => {
             {error && <p>Error: {error}</p>}
             {!loading && !error && todos.map((todo) => (
                 <TodoItem
-                    key={todo.id}
-                    id={todo.id}
+                    key={todo._id}
+                    _id={todo._id}
                     title={todo.title}
                     completed={todo.completed}
                     onToggle={handleToggle}
