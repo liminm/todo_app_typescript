@@ -6,8 +6,11 @@
   "scripts": {
     "build": "tsc"
   },
-  "dependencies": {},
+  "dependencies": {
+    "mongoose": "^8.10.0"
+  },
   "devDependencies": {
+    "@types/mongoose": "^5.11.97",
     "typescript": "^5.5.3"
   },
   "private": true
