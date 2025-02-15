@@ -4,27 +4,27 @@ import React from 'react'
 // Define the type for the component props using an interface
 interface TodoItemProps {
     // Unique id for the todo item
-    id: number
+    _id: string
     // Title of the todo
     title: string
     // Indicates whether the todo is completed
     completed: boolean
     // Callback function when the todo is toggled
-    onToggle: (id: number) => void
-    onDelete: (id: number) => void
+    onToggle: (_id: string) => void
+    onDelete: (_id: string) => void
 }
 
 // Define the TodoItem component as a functional component
-const TodoItem: React.FC<TodoItemProps> = ({ id, title, completed, onToggle, onDelete }) => {
+const TodoItem: React.FC<TodoItemProps> = ({ _id, title, completed, onToggle, onDelete }) => {
     return (
         <div>
             <input
                 type="checkbox"
                 checked={completed}
-                onChange={() => onToggle(id)}
+                onChange={() => onToggle(_id)}
             />
             <span>{title}</span>
-            <button onClick={() => onDelete(id)}>Delete</button>
+            <button onClick={() => onDelete(_id)}>Delete</button>
         </div>
     )
 }
