@@ -1,6 +1,9 @@
 import React, {useEffect, useState} from 'react'
 import TodoItem from './components/TodoItem'
 import AddTodo from './components/AddTodo'
+import Login from './components/Login'
+import Register from './components/Register';
+
 
 interface Todo {
     _id: string
@@ -9,17 +12,29 @@ interface Todo {
 }
 
 const App: React.FC = () => {
+
+    const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+    const [isRegistering, setIsRegistering] = useState<boolean>(false);
     const [todos, setTodos] = useState<Todo[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string>("")
+
+    const handleLoginSuccess = (newToken: string) => {
+        localStorage.setItem('token', newToken);
+        setToken(newToken);
+    }
+
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        window.location.reload();
+    };
 
 
     useEffect(() => {
         const fetchTodos = async () => {
             try {
-                const token = localStorage.getItem('token')
-
-                const response = await fetch('http://localhost:5000/api/todos', {
+                const response = await fetch('http://localhost:5000/api/v1/todos', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -37,7 +52,7 @@ const App: React.FC = () => {
             }
         }
         fetchTodos()
-    }, [])
+    }, [token])
 
     const handleToggle = async (id: string) => {
         const todo = todos.find((t) => t._id === id)
@@ -45,9 +60,7 @@ const App: React.FC = () => {
 
         const updatedTodo = {...todo, completed: !todo.completed}
         try {
-            const token = localStorage.getItem('token')
-
-            const response = await fetch(`http://localhost:5000/api/todos/${id}`, {
+            const response = await fetch(`http://localhost:5000/api/v1/todos/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -69,9 +82,7 @@ const App: React.FC = () => {
     const handleAddTodo = async (title: string) => {
         const newTodo = {title, completed: false}
         try {
-            const token = localStorage.getItem('token')
-
-            const response = await fetch(`http://localhost:5000/api/todos`, {
+            const response = await fetch(`http://localhost:5000/api/v1/todos`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -91,9 +102,7 @@ const App: React.FC = () => {
 
     const handleDelete = async (id: string) => {
         try {
-            const token = localStorage.getItem('token')
-
-            const response = await fetch(`http://localhost:5000/api/todos/${id}`, {
+            const response = await fetch(`http://localhost:5000/api/v1/todos/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -108,9 +117,23 @@ const App: React.FC = () => {
         }
     }
 
+    if (!token) {
+        return (
+            <div>
+                {isRegistering ? <Register onLoginSuccess={handleLoginSuccess}/> :
+                    <Login onLoginSuccess={handleLoginSuccess}/>}
+                <button onClick={() => setIsRegistering((prev) => !prev)}>
+                    {isRegistering ? 'Already have an account? Login' : 'Don\'t have an account? Register'}
+                </button>
+            </div>
+        );
+    }
+
+
     return (
         <div>
             <h1>Todo List</h1>
+            <button onClick={handleLogout}>Logout</button>
             <AddTodo onAdd={handleAddTodo}/>
             {loading && <p>Loading...</p>}
             {error && <p>Error: {error}</p>}
