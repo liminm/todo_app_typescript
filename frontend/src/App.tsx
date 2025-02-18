@@ -24,7 +24,6 @@ const App: React.FC = () => {
         setToken(newToken);
     }
 
-
     const handleLogout = () => {
         localStorage.removeItem('token');
         window.location.reload();
