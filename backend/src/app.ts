@@ -5,9 +5,7 @@ import authRouter from './routes/auth';
 import todosRouter from './routes/todos';
 import authMiddleware from './middleware/auth';
 import cors from 'cors'; // Import the cors package
-import dotenv from 'dotenv';
 import errorHandler from "./middleware/errorHandler";
-dotenv.config();
 
 const app: Application = express();
 app.use(cors());
@@ -36,8 +34,8 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
 
 app.use('/api/v1/auth', authRouter);
 
-// app.use('/api/v1/todos',authMiddleware,  todosRouter);
-app.use('/api/v1/todos', todosRouter);
+app.use('/api/v1/todos',authMiddleware,  todosRouter);
+// app.use('/api/v1/todos', todosRouter);
 app.use(errorHandler)
 
 
