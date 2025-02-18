@@ -18,8 +18,7 @@ router.post('/register', [
         if (!errors.isEmpty()) {
             res.status(400).json({errors: errors.array()});
             return
-        }
-        ;
+        };
 
 
         const {name, email, password} = req.body;
