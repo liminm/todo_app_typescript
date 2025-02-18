@@ -1,6 +1,10 @@
 import React, {useState} from 'react'
 
-const Login: React.FC = () => {
+interface LoginProps {
+    onLoginSuccess: (token: string) => void;
+}
+
+const Login: React.FC<LoginProps> = ({onLoginSuccess}) => {
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [error, setError] = useState<string>('')
@@ -8,7 +12,7 @@ const Login: React.FC = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
-            const response = await fetch('http://localhost:5000/api/auth/login', {
+            const response = await fetch('http://localhost:5000/api/v1/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -20,7 +24,7 @@ const Login: React.FC = () => {
             if (!response.ok) {
                 setError(data.error)
             } else {
-                localStorage.setItem('token', data.token)
+                onLoginSuccess(data.token)
                 console.log('Logged in successfully')
             }
         } catch (err) {
@@ -31,7 +35,7 @@ const Login: React.FC = () => {
     return (
         <form onSubmit={handleLogin}>
             <h2>Login</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{color: 'red'}}>{error}</p>}
 
             <input
                 type="email"
