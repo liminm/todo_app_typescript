@@ -32,26 +32,30 @@ const App: React.FC = () => {
 
     useEffect(() => {
         const fetchTodos = async () => {
+            if (!token) return; // Ensure token is available
+            setLoading(true);
+            setError("");
             try {
                 const response = await fetch('http://localhost:5000/api/v1/todos', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
-                })
+                });
                 if (!response.ok) {
-                    throw new Error('Network response was not ok')
+                    throw new Error('Network response was not ok');
                 }
-                const data = await response.json()
-                setTodos(data)
+                const data = await response.json();
+                setTodos(data);
             } catch (err: any) {
-                setError(err.message)
+                setError(err.message);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         }
-        fetchTodos()
-    }, [token])
+        fetchTodos();
+    }, [token]);
+
 
     const handleToggle = async (id: string) => {
         const todo = todos.find((t) => t._id === id)
