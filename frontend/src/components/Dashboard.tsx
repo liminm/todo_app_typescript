@@ -2,6 +2,12 @@ import React, {useEffect, useState} from 'react'
 import TodoItem from './TodoItem'
 import AddTodo from './AddTodo'
 
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
 
 interface Todo {
     _id: string
@@ -18,11 +24,6 @@ const Dashboard: React.FC<DashboardProps> = ({token}) => {
     const [todos, setTodos] = useState<Todo[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string>("")
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        window.location.reload();
-    };
 
     useEffect(() => {
         const fetchTodos = async () => {
@@ -104,22 +105,49 @@ const Dashboard: React.FC<DashboardProps> = ({token}) => {
         }
     }
 
-    return (<div>
-        <h1>Your Dashboard</h1>
-        <button onClick={handleLogout}>Logout</button>
-        <AddTodo onAdd={handleAddTodo}/>
-        {loading && <p>Loading todos...</p>}
-        {error && <p style={{color: 'red'}}>Error: {error}</p>}
-        {!loading && !error && todos.length === 0 && <p>No todos found.</p>}
-        {!loading && !error && todos.map((todo) => (<TodoItem
-            key={todo._id}
-            _id={todo._id}
-            title={todo.title}
-            completed={todo.completed}
-            onToggle={handleToggle}
-            onDelete={handleDelete}
-        />))}
-    </div>)
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        window.location.reload();
+    };
+
+    return (
+        <Container maxWidth="md">
+            <Typography variant="h4" align="center" gutterBottom>
+                Your Dashboard
+            </Typography>
+            <Box display="flex" justifyContent="flex-end" mb={2}>
+                <Button variant="contained" color="secondary" onClick={handleLogout}>
+                    Logout
+                </Button>
+            </Box>
+            <AddTodo onAdd={handleAddTodo}/>
+            {loading && (
+                <Box display="flex" justifyContent="center" mt={2}>
+                    <CircularProgress/>
+                </Box>
+            )}
+            {error && (
+                <Alert severity="error" sx={{my: 2}}>
+                    Error: {error}
+                </Alert>
+            )}
+            {!loading && !error && todos.length === 0 && (
+                <Typography variant="body1" align="center" sx={{my: 2}}>
+                    No todos found.
+                </Typography>
+            )}
+            {!loading && !error && todos.map((todo) => (
+                <TodoItem
+                    key={todo._id}
+                    _id={todo._id}
+                    title={todo.title}
+                    completed={todo.completed}
+                    onToggle={handleToggle}
+                    onDelete={handleDelete}
+                />
+            ))}
+        </Container>
+    )
 }
 
 export default Dashboard
