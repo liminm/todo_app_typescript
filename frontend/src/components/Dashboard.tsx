@@ -8,6 +8,11 @@ import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
+import TextField from '@mui/material/TextField'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
 
 interface Todo {
     _id: string
@@ -24,6 +29,8 @@ const Dashboard: React.FC<DashboardProps> = ({token}) => {
     const [todos, setTodos] = useState<Todo[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string>("")
+    const [searchQuery, setSearchQuery] = useState<string>("")
+    const [filterStatus, setFilterStatus] = useState<string>("all")
 
     useEffect(() => {
         const fetchTodos = async () => {
@@ -110,6 +117,18 @@ const Dashboard: React.FC<DashboardProps> = ({token}) => {
         window.location.reload();
     };
 
+
+    const filteredTodos = todos.filter(todo => {
+        const matchesSearch = todo.title.toLowerCase().includes(searchQuery.toLowerCase())
+        let matchesStatus = true
+        if (filterStatus === 'completed'){
+            matchesStatus = todo.completed
+        } else if (filterStatus === 'pending'){
+            matchesStatus = !todo.completed
+        }
+        return matchesSearch && matchesStatus
+    })
+
     return (
         <Container maxWidth="md">
             <Typography variant="h4" align="center" gutterBottom>
@@ -120,6 +139,30 @@ const Dashboard: React.FC<DashboardProps> = ({token}) => {
                     Logout
                 </Button>
             </Box>
+            <Box mb={2} display="flex" justifyContent="space-between">
+                <TextField
+                    label="Search Todos"
+                    variant="outlined"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    fullWidth
+                    sx={{mr: 2}}
+                />
+                <FormControl variant="outlined" sx={{minWidth: 120}}>
+                    <InputLabel id="filter-label">Status</InputLabel>
+                    <Select
+                        labelId="filter-label"
+                        label="Status"
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        >
+                        <MenuItem value="all">All</MenuItem>
+                        <MenuItem value="completed">Completed</MenuItem>
+                        <MenuItem value="pending">Pending</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
+
             <AddTodo onAdd={handleAddTodo}/>
             {loading && (
                 <Box display="flex" justifyContent="center" mt={2}>
@@ -131,12 +174,12 @@ const Dashboard: React.FC<DashboardProps> = ({token}) => {
                     Error: {error}
                 </Alert>
             )}
-            {!loading && !error && todos.length === 0 && (
+            {!loading && !error && filteredTodos.length === 0 && (
                 <Typography variant="body1" align="center" sx={{my: 2}}>
                     No todos found.
                 </Typography>
             )}
-            {!loading && !error && todos.map((todo) => (
+            {!loading && !error && filteredTodos.map((todo) => (
                 <TodoItem
                     key={todo._id}
                     _id={todo._id}
