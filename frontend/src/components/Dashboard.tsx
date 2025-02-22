@@ -13,6 +13,7 @@ import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
+import { useSnackbar } from 'notistack'
 
 interface Todo {
     _id: string
@@ -31,6 +32,7 @@ const Dashboard: React.FC<DashboardProps> = ({token}) => {
     const [error, setError] = useState<string>("")
     const [searchQuery, setSearchQuery] = useState<string>("")
     const [filterStatus, setFilterStatus] = useState<string>("all")
+    const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
         const fetchTodos = async () => {
@@ -50,12 +52,13 @@ const Dashboard: React.FC<DashboardProps> = ({token}) => {
                 setTodos(data);
             } catch (err: any) {
                 setError(err.message);
+                enqueueSnackbar(`Error fetching todos: ${err.message}`, { variant: 'error' });
             } finally {
                 setLoading(false);
             }
         }
         fetchTodos();
-    }, [token]);
+    }, [token, enqueueSnackbar]);
 
 
     const handleToggle = async (id: string) => {
@@ -73,8 +76,10 @@ const Dashboard: React.FC<DashboardProps> = ({token}) => {
                 throw new Error('Network response was not ok')
             }
             setTodos((prevTodos) => prevTodos.map((t) => (t._id === id ? updatedTodo : t)))
+            enqueueSnackbar('Todo updated successfully', { variant: 'success' })
         } catch (err: any) {
             console.error(err)
+            enqueueSnackbar(`Error updating todo: ${err.message}`, { variant: 'error' })
         }
     }
 
@@ -91,8 +96,10 @@ const Dashboard: React.FC<DashboardProps> = ({token}) => {
             }
             const createdTodo = await response.json()
             setTodos((prevTodos) => [...prevTodos, createdTodo])
+            enqueueSnackbar('Todo added successfully', { variant: 'success' })
         } catch (err: any) {
             console.error(err)
+            enqueueSnackbar(`Error adding todo: ${err.message}`, { variant: 'error' })
         }
     }
 
@@ -107,8 +114,10 @@ const Dashboard: React.FC<DashboardProps> = ({token}) => {
                 throw new Error('Failed to delete todo')
             }
             setTodos((prevTodos) => prevTodos.filter((t) => t._id !== id))
+            enqueueSnackbar('Todo deleted successfully', { variant: 'success' })
         } catch (err: any) {
             console.error(err)
+            enqueueSnackbar(`Error deleting todo: ${err.message}`, { variant: 'error' })
         }
     }
 
